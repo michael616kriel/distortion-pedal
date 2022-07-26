@@ -36,34 +36,47 @@ public:
 
         auto& waveshaper = processorChain.template get<waveshaperIndex>();
         std::function<Type(Type)> shaperFunc = [&](float x) {
-            float wetSignal = ((3 * x) / 2) * (1 - (pow(x, 2) / 3));
-            float wetSignal2 = wetSignal;
+        //     float wetSignal = ((3 * x) / 2) * (1 - (pow(x, 2) / 3));
+        //     float wetSignal2 = wetSignal;
+
+        //     wetSignal *= drive * range;
+        //     wetSignal2 *= drive * range;
+
+        //     /*
+        //     if (wetSignal2 > 0) {
+        //         wetSignal2 = 1 - exp(-wetSignal2);
+        //     } else {
+        //         wetSignal2 = -1 + exp(wetSignal2);
+        //     }
+        //   */
+        //     if (1 < wetSignal && wetSignal < -0.08905f) {
+        //         wetSignal = (3 / 4) * (1 - pow(1 - (abs(wetSignal) - 0.032847f), 12) + (1 / 3) * (abs(wetSignal) - 0.032847));
+        //     }
+
+        //     if (-0.08905f < wetSignal && wetSignal < 0.320018) {
+        //         wetSignal = (-6.153 * pow(wetSignal, 2)) + 3.9375 * wetSignal;
+        //     }
+
+        //     if (0.320018 < wetSignal && wetSignal < 1) {
+        //         wetSignal = 0.630035;
+        //     }
+
+        //     wetSignal = ((wetSignal * blend) + (juce::jlimit(Type(-1), Type(1), wetSignal2) * (1.0f / blend) / 2)) * volume;
+
+        //     return juce::jlimit(Type(-1), Type(1), wetSignal);
+        //          float wetSignal = ((3 * x) / 2) * (1 - (pow(x, 2) / 3));
+            //float wetSignal2 = wetSignal;
+            float wetSignal = std::tanh (x);
+            float wetSignal2 = x;
 
             wetSignal *= drive * range;
             wetSignal2 *= drive * range;
 
-            /*
-            if (wetSignal2 > 0) {
-                wetSignal2 = 1 - exp(-wetSignal2);
-            } else {
-                wetSignal2 = -1 + exp(wetSignal2);
-            }
-          */
-            if (1 < wetSignal && wetSignal < -0.08905f) {
-                wetSignal = (3 / 4) * (1 - pow(1 - (abs(wetSignal) - 0.032847f), 12) + (1 / 3) * (abs(wetSignal) - 0.032847));
-            }
+//          wetSignal = ((wetSignal * blend) + (juce::jlimit(Type(-1), Type(1), wetSignal2) * (1.0f / blend) / 2)) * volume;
+            
+            return std::tanh (x);
 
-            if (-0.08905f < wetSignal && wetSignal < 0.320018) {
-                wetSignal = (-6.153 * pow(wetSignal, 2)) + 3.9375 * wetSignal;
-            }
-
-            if (0.320018 < wetSignal && wetSignal < 1) {
-                wetSignal = 0.630035;
-            }
-
-            wetSignal = ((wetSignal * blend) + (juce::jlimit(Type(-1), Type(1), wetSignal2) * (1.0f / blend) / 2)) * volume;
-
-            return juce::jlimit(Type(-1), Type(1), wetSignal);
+//          return juce::jlimit(Type(-1), Type(1), wetSignal);
         };
 
         waveshaper.functionToUse = shaperFunc;
