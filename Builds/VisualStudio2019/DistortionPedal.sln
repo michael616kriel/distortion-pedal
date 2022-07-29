@@ -1,5 +1,6 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2019
+# Visual Studio Version 16
 
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DistortionPedal - Standalone Plugin", "DistortionPedal_StandalonePlugin.vcxproj", "{4EF9B82B-A77E-9679-9F87-0B70C15659AC}"
 	ProjectSection(ProjectDependencies) = postProject
