@@ -15,7 +15,7 @@
 //==============================================================================
 /*
 */
-class ReverbComponent : public juce::Component
+class ReverbComponent : public juce::Component, public juce::AudioProcessorValueTreeState::Listener
 {
 public:
     ReverbComponent(juce::AudioProcessorValueTreeState&);
@@ -24,10 +24,15 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
 
+    void parameterChanged(const juce::String& parameter, float newValue) override;
+
 private:
     typedef juce::AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
+    typedef juce::AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
 
     juce::AudioProcessorValueTreeState& valueTreeState;
+
+    juce::Label pedalLabel;
 
     juce::Label roomSizeLabel;
     juce::Slider roomSizeSlider;
@@ -52,6 +57,9 @@ private:
     juce::Label freezeModeLabel;
     juce::Slider freezeModeSlider;
     std::unique_ptr<SliderAttachment> freezeModeAttachment;
+
+    juce::TextButton bypassButton;
+    std::unique_ptr<ButtonAttachment> bypassAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ReverbComponent)
 };

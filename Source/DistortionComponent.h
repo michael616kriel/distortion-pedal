@@ -16,7 +16,7 @@
 //==============================================================================
 /*
 */
-class DistortionComponent : public juce::Component
+class DistortionComponent : public juce::Component, public juce::AudioProcessorValueTreeState::Listener
 {
 public:
     DistortionComponent(juce::AudioProcessorValueTreeState&);
@@ -25,11 +25,17 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
 
+    void parameterChanged(const juce::String& parameter, float newValue) override;
+
 private:
 
     typedef juce::AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
+    typedef juce::AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
+
 
     juce::AudioProcessorValueTreeState& valueTreeState;
+
+    juce::Label pedalLabel;
 
     juce::Label driveLabel;
     juce::Slider driveSlider;
@@ -55,6 +61,9 @@ private:
     juce::Label toneLowLabel;
     juce::Slider toneLowSlider;
     std::unique_ptr<SliderAttachment> toneLowAttachment;
+
+    juce::TextButton bypassButton;
+    std::unique_ptr<ButtonAttachment> bypassAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DistortionComponent)
 };

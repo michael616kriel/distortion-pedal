@@ -16,9 +16,18 @@ DelayComponent::DelayComponent(juce::AudioProcessorValueTreeState& vts) : valueT
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
+    valueTreeState.addParameterListener("delay-bypass", this);
+
+    addAndMakeVisible(pedalLabel);
+    pedalLabel.setText("Delay", juce::dontSendNotification);
+    pedalLabel.setFont(juce::Font(18.0f, juce::Font::bold));
+    pedalLabel.setJustificationType(juce::Justification::centred);
+    pedalLabel.setColour(juce::Label::textColourId, juce::Colours::black);
+
     maxDelayTimeLabel.setText("Max Delay Time", juce::dontSendNotification);
-    maxDelayTimeLabel.setFont(juce::Font(12.0f, juce::Font::plain));
+    maxDelayTimeLabel.setFont(juce::Font(10.0f, juce::Font::plain));
     maxDelayTimeLabel.setJustificationType(juce::Justification::centred);
+    maxDelayTimeLabel.setColour(juce::Label::textColourId, juce::Colours::black);
     addAndMakeVisible(maxDelayTimeLabel);
 
     addAndMakeVisible(maxDelayTimeSlider);
@@ -27,8 +36,9 @@ DelayComponent::DelayComponent(juce::AudioProcessorValueTreeState& vts) : valueT
     maxDelayTimeAttachment.reset(new SliderAttachment(valueTreeState, "delay-maxDelayTime", maxDelayTimeSlider));
 
     delayTimeLabel.setText("Delay Time", juce::dontSendNotification);
-    delayTimeLabel.setFont(juce::Font(12.0f, juce::Font::plain));
+    delayTimeLabel.setFont(juce::Font(10.0f, juce::Font::plain));
     delayTimeLabel.setJustificationType(juce::Justification::centred);
+    delayTimeLabel.setColour(juce::Label::textColourId, juce::Colours::black);
     addAndMakeVisible(delayTimeLabel);
 
     addAndMakeVisible(delayTimeSlider);
@@ -37,8 +47,9 @@ DelayComponent::DelayComponent(juce::AudioProcessorValueTreeState& vts) : valueT
     delayTimeAttachment.reset(new SliderAttachment(valueTreeState, "delay-delayTime", delayTimeSlider));
 
     wetLevelLabel.setText("Wet Level", juce::dontSendNotification);
-    wetLevelLabel.setFont(juce::Font(12.0f, juce::Font::plain));
+    wetLevelLabel.setFont(juce::Font(10.0f, juce::Font::plain));
     wetLevelLabel.setJustificationType(juce::Justification::centred);
+    wetLevelLabel.setColour(juce::Label::textColourId, juce::Colours::black);
     addAndMakeVisible(wetLevelLabel);
 
     addAndMakeVisible(wetLevelSlider);
@@ -47,14 +58,24 @@ DelayComponent::DelayComponent(juce::AudioProcessorValueTreeState& vts) : valueT
     wetLevelAttachment.reset(new SliderAttachment(valueTreeState, "delay-wetLevel", wetLevelSlider));
 
     feedbackLabel.setText("Feedback", juce::dontSendNotification);
-    feedbackLabel.setFont(juce::Font(12.0f, juce::Font::plain));
+    feedbackLabel.setFont(juce::Font(10.0f, juce::Font::plain));
     feedbackLabel.setJustificationType(juce::Justification::centred);
+    feedbackLabel.setColour(juce::Label::textColourId, juce::Colours::black);
     addAndMakeVisible(feedbackLabel);
 
     addAndMakeVisible(feedbackSlider);
     feedbackSlider.setSliderStyle(juce::Slider::Rotary);
     feedbackSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
     feedbackAttachment.reset(new SliderAttachment(valueTreeState, "delay-feedback", feedbackSlider));
+
+    addAndMakeVisible(&bypassButton);
+    bypassButton.setButtonText("OFF");
+
+    bypassButton.setColour(juce::TextButton::buttonColourId, juce::Colours::red);
+    bypassButton.setColour(juce::TextButton::buttonOnColourId, juce::Colours::green);
+    bypassButton.setClickingTogglesState(true);
+    bypassAttachment.reset(new ButtonAttachment(valueTreeState, "delay-bypass", bypassButton));
+
 
 }
 
@@ -65,14 +86,7 @@ DelayComponent::~DelayComponent()
 
 void DelayComponent::paint(juce::Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code..
-    */
-
-    g.fillAll(juce::Colours::black);   // clear the background
+    g.fillAll(juce::Colour::fromRGB(208, 177, 252));
 
     g.setColour(juce::Colours::grey);
     g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
@@ -83,22 +97,45 @@ void DelayComponent::resized()
 {
     auto labelHeight = 10.0f;
     auto area = getLocalBounds().reduced(5.0f, 5.0f);
-    auto width = area.getWidth() / 4;
 
-    auto maxDelayTimeArea = area.removeFromLeft(width);
+    auto headingArea = area.removeFromTop(16.0f);
+    auto paramsArea = area.removeFromTop(area.proportionOfHeight(0.7f));
+    auto bypassArea = area.removeFromBottom(area.proportionOfHeight(0.3f));
+
+    auto topAreaItemSize = paramsArea.proportionOfHeight(0.5f);
+    auto topArea = paramsArea.removeFromTop(topAreaItemSize);
+    auto bottomArea = paramsArea.removeFromBottom(topAreaItemSize);
+
+    auto topItemSize = topArea.proportionOfWidth(0.5f);
+    auto bottomItemSize = bottomArea.proportionOfWidth(0.5f);
+
+    pedalLabel.setBounds(headingArea);
+
+    auto maxDelayTimeArea = topArea.removeFromLeft(topItemSize);
     maxDelayTimeSlider.setBounds(maxDelayTimeArea.removeFromTop(maxDelayTimeArea.getHeight() - labelHeight));
     maxDelayTimeLabel.setBounds(maxDelayTimeArea.removeFromBottom(labelHeight));
 
-    auto delayTimeArea = area.removeFromLeft(width);
+    auto delayTimeArea = topArea.removeFromLeft(topItemSize);
     delayTimeSlider.setBounds(delayTimeArea.removeFromTop(delayTimeArea.getHeight() - labelHeight));
     delayTimeLabel.setBounds(delayTimeArea.removeFromBottom(labelHeight));
 
-    auto wetLevelArea = area.removeFromLeft(width);
+    auto wetLevelArea = bottomArea.removeFromLeft(bottomItemSize);
     wetLevelSlider.setBounds(wetLevelArea.removeFromTop(wetLevelArea.getHeight() - labelHeight));
     wetLevelLabel.setBounds(wetLevelArea.removeFromBottom(labelHeight));
 
-    auto feedbackArea = area.removeFromLeft(width);
+    auto feedbackArea = bottomArea.removeFromLeft(bottomItemSize);
     feedbackSlider.setBounds(feedbackArea.removeFromTop(feedbackArea.getHeight() - labelHeight));
     feedbackLabel.setBounds(feedbackArea.removeFromBottom(labelHeight));
 
+    bypassButton.setBounds(bypassArea);
+
+}
+
+void DelayComponent::parameterChanged(const juce::String& parameter, float newValue) {
+    if (newValue == 1) {
+        bypassButton.setButtonText("ON");
+    }
+    else {
+        bypassButton.setButtonText("OFF");
+    }
 }

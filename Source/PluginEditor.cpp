@@ -17,11 +17,10 @@ DistortionPedalAudioProcessorEditor::DistortionPedalAudioProcessorEditor (Distor
     // editor's size to whatever you need it to be.
     setLookAndFeel(&customLookAndFeel);
     addAndMakeVisible(distortionComponent);
-    addAndMakeVisible(reverbComponent);
     addAndMakeVisible(delayComponent);
-
-
-    setSize(400, 600);
+    addAndMakeVisible(reverbComponent);
+    
+    setSize(700, 400);
 
 }
 
@@ -34,7 +33,7 @@ DistortionPedalAudioProcessorEditor::~DistortionPedalAudioProcessorEditor()
 void DistortionPedalAudioProcessorEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (juce::Colour::fromRGB(17, 17, 17));
+    g.fillAll(juce::Colour::fromRGB(0, 0, 0));
 
     g.setColour(juce::Colours::white);
 }
@@ -43,21 +42,17 @@ void DistortionPedalAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-    auto area = getLocalBounds().reduced(5.0f, 5.0f);
-    auto topArea = area.removeFromTop(300).reduced(5.0f, 5.0f);
-    auto bottomArea = area.removeFromBottom(300);
+    auto area = getLocalBounds();
+    auto distortionSize = area.proportionOfWidth(0.29f);
+    auto delaySize = area.proportionOfWidth(0.29f);
+    auto reverbSize = area.proportionOfWidth(0.42f);
 
-    auto reverbArea = bottomArea.removeFromTop(200).reduced(5.0f, 5.0f);
-    auto delayArea = bottomArea.removeFromBottom(100).reduced(5.0f, 5.0f);
+    auto distortionArea = area.removeFromLeft(distortionSize).reduced(5.0f, 5.0f);
+    auto delayArea = area.removeFromLeft(delaySize).reduced(5.0f, 5.0f);
+    auto reverbArea = area.removeFromLeft(reverbSize).reduced(5.0f, 5.0f);
 
-    distortionComponent.setBounds(topArea);
-    distortionComponent.setSize(topArea.getWidth(), topArea.getHeight());
-
+    distortionComponent.setBounds(distortionArea);
     reverbComponent.setBounds(reverbArea);
-    reverbComponent.setSize(reverbArea.getWidth(), reverbArea.getHeight());
-
     delayComponent.setBounds(delayArea);
-    delayComponent.setSize(delayArea.getWidth(), delayArea.getHeight());
-
 
 }

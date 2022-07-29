@@ -19,11 +19,11 @@ public:
     //==============================================================================
     Delay()
     {
-        setMaxDelayTime(currentMaxDelayTime);
+        /*setMaxDelayTime(currentMaxDelayTime);
         setDelayTime(0, currentDelayTime);
         setDelayTime(1, currentDelayTime);
         setWetLevel(currentWetLevel);
-        setFeedback(currentFeedback);
+        setFeedback(currentFeedback);*/
    
     }
 

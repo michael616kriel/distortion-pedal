@@ -35,7 +35,7 @@ public:
         g.fillEllipse(rx, ry, rw, rw);
 
         // outline
-        g.setColour(juce::Colours::darkgrey);
+        g.setColour(juce::Colours::black);
         g.drawEllipse(rx, ry, rw, rw, 1.0f);
 
         juce::Path p;

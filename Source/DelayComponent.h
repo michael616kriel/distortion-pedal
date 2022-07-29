@@ -16,7 +16,7 @@
 //==============================================================================
 /*
 */
-class DelayComponent : public juce::Component
+class DelayComponent : public juce::Component, public juce::AudioProcessorValueTreeState::Listener
 {
 public:
     DelayComponent(juce::AudioProcessorValueTreeState&);
@@ -25,11 +25,16 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
 
+    void parameterChanged(const juce::String& parameter, float newValue) override;
+
 private:
 
     typedef juce::AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
+    typedef juce::AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
 
     juce::AudioProcessorValueTreeState& valueTreeState;
+
+    juce::Label pedalLabel;
 
     juce::Label maxDelayTimeLabel;
     juce::Slider maxDelayTimeSlider;
@@ -46,6 +51,9 @@ private:
     juce::Label feedbackLabel;
     juce::Slider feedbackSlider;
     std::unique_ptr<SliderAttachment> feedbackAttachment;
+
+    juce::TextButton bypassButton;
+    std::unique_ptr<ButtonAttachment> bypassAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DelayComponent)
 };

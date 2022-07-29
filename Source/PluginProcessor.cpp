@@ -13,35 +13,38 @@
 DistortionPedalAudioProcessor::DistortionPedalAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::mono(), true)
-                      #endif
-                       .withOutput ("Output", juce::AudioChannelSet::mono(), true)
-                     #endif
+                   //  #if ! JucePlugin_IsMidiEffect
+                   //   #if ! JucePlugin_IsSynth
+                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
+                  //    #endif
+                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
+                 //    #endif
                        ),
 #endif
     parameters(*this, nullptr, juce::Identifier("DistortionVst"), {
             // Distortion
-            std::make_unique<juce::AudioParameterFloat>("drive-drive", "Distortion",  juce::NormalisableRange<float>(0.0f, 10.0f, 0.001f),  0.5f),
-            std::make_unique<juce::AudioParameterFloat>("drive-range", "Range",  juce::NormalisableRange<float>(0.0f, 3000.0f, 0.001f),  300.0f),
-            std::make_unique<juce::AudioParameterFloat>("drive-blend", "Blend",  juce::NormalisableRange<float>(0.0f, 1.0f, 0.001f),  0.5f),
-            std::make_unique<juce::AudioParameterFloat>("drive-volume", "Volume",  juce::NormalisableRange<float>(0.0f, 1.0f, 0.001f),  1.0f),
+            std::make_unique<juce::AudioParameterFloat>("drive-drive", "Distortion",  juce::NormalisableRange<float>(0.1f, 1.0f, 0.001f),  0.1f),
+            std::make_unique<juce::AudioParameterFloat>("drive-range", "Range",  juce::NormalisableRange<float>(0.1f, 2000.0f, 0.001f),  50.0f),
+            std::make_unique<juce::AudioParameterFloat>("drive-blend", "Blend",  juce::NormalisableRange<float>(0.1f, 1.0f, 0.001f),  0.2f),
+            std::make_unique<juce::AudioParameterFloat>("drive-volume", "Volume",  juce::NormalisableRange<float>(0.1f, 1.0f, 0.001f),  0.3f),
+            std::make_unique<juce::AudioParameterBool>("drive-bypass", "Bypass",  false),
 
-            std::make_unique<juce::AudioParameterFloat>("drive-tone-high", "Tone High",  juce::NormalisableRange<float>(500.0f, 900.0f, 1.0f),  580.0f),
-            std::make_unique<juce::AudioParameterFloat>("drive-tone-low", "Tone Low",  juce::NormalisableRange<float>(6000.0f, 10000.0f, 1.0f),  8000.0f),
             // Reverb
-            std::make_unique<juce::AudioParameterFloat>("reverb-roomSize", "Room Size", juce::NormalisableRange<float>(0.0f, 1.0f, 0.1f), 0.5f),
-            std::make_unique<juce::AudioParameterFloat>("reverb-damping", "Damping", juce::NormalisableRange<float>(0.0f, 1.0f, 0.1f), 0.5f),
-            std::make_unique<juce::AudioParameterFloat>("reverb-wetLevel", "Wet Level", juce::NormalisableRange<float>(0.0f, 1.0f, 0.1f), 0.33f),
-            std::make_unique<juce::AudioParameterFloat>("reverb-dryLevel", "Dry Level", juce::NormalisableRange<float>(0.0f, 1.0f, 0.1f), 0.4f),
-            std::make_unique<juce::AudioParameterFloat>("reverb-width", "Width", juce::NormalisableRange<float>(0.0f, 1.0f, 0.1f), 1.0f),
-            std::make_unique<juce::AudioParameterFloat>("reverb-freezeMode", "Freeze Mode", juce::NormalisableRange<float>(0.0f, 1.0f, 0.1f), 0.1f),
+            std::make_unique<juce::AudioParameterFloat>("reverb-roomSize", "Room Size", juce::NormalisableRange<float>(0.1f, 1.0f, 0.1f), 0.5f),
+            std::make_unique<juce::AudioParameterFloat>("reverb-damping", "Damping", juce::NormalisableRange<float>(0.1f, 1.0f, 0.1f), 0.5f),
+            std::make_unique<juce::AudioParameterFloat>("reverb-wetLevel", "Wet Level", juce::NormalisableRange<float>(0.1f, 1.0f, 0.1f), 0.33f),
+            std::make_unique<juce::AudioParameterFloat>("reverb-dryLevel", "Dry Level", juce::NormalisableRange<float>(0.1f, 1.0f, 0.1f), 0.4f),
+            std::make_unique<juce::AudioParameterFloat>("reverb-width", "Width", juce::NormalisableRange<float>(0.1f, 1.0f, 0.1f), 1.0f),
+            std::make_unique<juce::AudioParameterFloat>("reverb-freezeMode", "Freeze Mode", juce::NormalisableRange<float>(0.0f, 1.0f, 0.1f), 0),
+            std::make_unique<juce::AudioParameterBool>("reverb-bypass", "Bypass",  false),
+
             // Delay
-            std::make_unique<juce::AudioParameterFloat>("delay-maxDelayTime", "Max Delay Time", juce::NormalisableRange<float>(0.0f, 1.0f, 0.1f), 1.0f),
-            std::make_unique<juce::AudioParameterFloat>("delay-delayTime", "Delay Time", juce::NormalisableRange<float>(0.0f, 1.0f, 0.1f), 0.5f),
-            std::make_unique<juce::AudioParameterFloat>("delay-wetLevel", "Wet Level", juce::NormalisableRange<float>(0.0f, 1.0f, 0.1f), 0.1f),
-            std::make_unique<juce::AudioParameterFloat>("delay-feedback", "Feedback", juce::NormalisableRange<float>(0.0f, 1.0f, 0.1f), 0.1f),
+            std::make_unique<juce::AudioParameterFloat>("delay-maxDelayTime", "Max Delay Time", juce::NormalisableRange<float>(0.1f, 1.0f, 0.1f), 1.0f),
+            std::make_unique<juce::AudioParameterFloat>("delay-delayTime", "Delay Time", juce::NormalisableRange<float>(0.01f, 1.0f, 0.1f), 0.5f),
+            std::make_unique<juce::AudioParameterFloat>("delay-wetLevel", "Wet Level", juce::NormalisableRange<float>(0.1f, 1.0f, 0.1f), 0.1f),
+            std::make_unique<juce::AudioParameterFloat>("delay-feedback", "Feedback", juce::NormalisableRange<float>(0.1f, 1.0f, 0.1f), 0.1f),
+            std::make_unique<juce::AudioParameterBool>("delay-bypass", "Bypass",  false),
+
         }),
         audioEngine(parameters)
 {
@@ -149,6 +152,12 @@ void DistortionPedalAudioProcessor::releaseResources()
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool DistortionPedalAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
 {
+
+    if (layouts.getMainInputChannelSet() != juce::AudioChannelSet::mono()
+        && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
+        return false;
+
+    return layouts.getMainInputChannelSet() == layouts.getMainOutputChannelSet();
 #if JucePlugin_IsMidiEffect
     juce::ignoreUnused(layouts);
     return true;
@@ -163,12 +172,13 @@ bool DistortionPedalAudioProcessor::isBusesLayoutSupported(const BusesLayout& la
 
     // This checks if the input layout matches the output layout
 #if ! JucePlugin_IsSynth
-    if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
-        return false;
+   // if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
+   //     return false;
 #endif
 
     return true;
 #endif
+
 }
 #endif
 
@@ -184,10 +194,10 @@ void DistortionPedalAudioProcessor::processBlock (juce::AudioBuffer<float>& buff
     if (totalNumInputChannels == 2) {
         // add the right (1) to the left (0)
         // store the sum in the left
-      //  buffer.addFrom(0, 0, buffer, 1, 0, buffer.getNumSamples());
+        buffer.addFrom(1, 0, buffer, 0, 0, buffer.getNumSamples());
 
         // copy the combined left (0) to the right (1)
-     //   buffer.copyFrom(1, 0, buffer, 0, 0, buffer.getNumSamples());
+        buffer.copyFrom(0, 0, buffer, 1, 0, buffer.getNumSamples());
     }
  
     audioEngine.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
