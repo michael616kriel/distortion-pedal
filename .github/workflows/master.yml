@@ -6,8 +6,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    - name: Checkout
-          uses: actions/checkout@v2
+
+    steps:
+    - uses: actions/checkout@v2
+
     - name: Archive artifacts
       uses: actions/upload-artifact@v2
       with:
